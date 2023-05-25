@@ -92,19 +92,28 @@ namespace AKAIVMIX
                 try
                 {
                     inputs = ReadTheApiUpdateLoop.ReadApi();
-                    first8AudioSources = ReadTheApiUpdateLoop.audio(inputs);
+                    first8AudioSources = ReadTheApiUpdateLoop.audio(inputs); 
                     if(needClear)
                     {
                         ClearPad(midi, locToPad);
                         needClear= false;
                         Console.Clear();
-                        Console.WriteLine("Connected to vMix with " + inputs.Length + "inputs.");
+                        int inputCounts = 0;
+                        foreach (var input in inputs)
+                        {
+                            if(input != null)
+                                inputCounts++;
+                        }
+
+
+                        Console.WriteLine("Connected to vMix with " + inputCounts + " inputs.");
                         Console.WriteLine("\tSilders are assinged to:");
                         foreach(var input in first8AudioSources)
                         {
-                            Console.WriteLine("\t" + input.number + ": " + input.title);
+                            if(input != null)
+                                Console.WriteLine("\t" + input.number + ": " + input.title);
                         }
-                        Console.WriteLine("\t 9: Master Volume");
+                        Console.WriteLine("\t 0: Master Volume");
                     }
                     InputHandler.CheckInputsAndHandle(midi, locToPad, inputs);
                     InputHandler.HandleSliders(midi, first8AudioSources);

@@ -86,13 +86,17 @@ namespace AKAIVMIX
 
             foreach (Input input in inputs)
             {
-                if (input.hasAudio)
+                if(input != null)
                 {
-                    if (count < 7)
+                    if (input.hasAudio)
                     {
-                        inputsWithAudio[count] = input;
-                        count++;
+                        if (count < 7)
+                        {
+                            inputsWithAudio[count] = input;
+                            count++;
+                        }
                     }
+
                 }
             }
 
