@@ -13,7 +13,8 @@ namespace AKAIVMIX
 
         static void Main(string[] args)
         {
-            IniFile config = new IniFile(@"%appdata\AKAIVMIX.ini");
+            string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\AKAIVMIX.INI";
+            IniFile config = new IniFile(FilePath);
 
             //Configure TopToBottom or BottomToTop and generate LocToPad
             if(!config.KeyExists("topToBottom"))
@@ -43,7 +44,7 @@ namespace AKAIVMIX
             }
             else
             {
-                locToPad = new LocToPad(Convert.ToBoolean(config.GetKeyValue("topToBottom")));
+                locToPad = new LocToPad(Convert.ToBoolean(int.Parse(config.GetKeyValue("topToBottom"))));
             }
 
             //Load device from config or display selector
@@ -82,6 +83,7 @@ namespace AKAIVMIX
                     config.Write("devid", deviceID.ToString());
                 }
             }
+            Console.WriteLine("Connected to " + MidiOut.DeviceInfo(int.Parse(config.GetKeyValue("devid"))).ProductName);
 
             //Main loop.
             while (true)
