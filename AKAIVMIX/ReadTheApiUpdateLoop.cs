@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
+
 namespace AKAIVMIX
 {
     internal class ReadTheApiUpdateLoop
     {
-        internal static Input[] RunLoopOnce()
+        internal static Input[] ReadApi()
         {
             Input[] inputs = new Input[64];
             String URLString = "http://localhost:8088/api";
