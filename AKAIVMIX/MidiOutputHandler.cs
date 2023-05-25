@@ -18,7 +18,7 @@ namespace AKAIVMIX
         private static int defaultAudioDisabledColor = 0;
 
 
-        public static void writeWithBlinkBrightnessMidi(MidiOut midiOut, LocToPad locToPad, int index, int color, int birghtorblink)
+        public static void WriteWithBlinkBrightnessMidi(MidiOut midiOut, LocToPad locToPad, int index, int color, int birghtorblink)
         {
             var noteOnEvent = new NoteOnEvent(0L, birghtorblink, locToPad.getNoteLocFromIndex(index - 1), color, 0);
             midiOut.Send(noteOnEvent.GetAsShortMessage());
@@ -26,7 +26,7 @@ namespace AKAIVMIX
             return;
         }
 
-        public static void writeLittle(MidiOut midiOut, int index, bool on, bool blink)
+        public static void WriteLittle(MidiOut midiOut, int index, bool on, bool blink)
         {
             var noteOnEvent = new NoteOnEvent(0L, 1, index, 0, 0);
             if (on)
@@ -48,7 +48,7 @@ namespace AKAIVMIX
 
         public static void WriteMidi(MidiOut midiOut, LocToPad locToPad, int index, int color)
         {
-            writeWithBlinkBrightnessMidi(midiOut,locToPad,index,color, 6);
+            WriteWithBlinkBrightnessMidi(midiOut,locToPad,index,color, 6);
         }
 
         public static void WriteDefault(MidiOut midiOut, LocToPad locToPad, int index)
@@ -56,37 +56,88 @@ namespace AKAIVMIX
             WriteMidi(midiOut,locToPad,index,defaultColor);
         }
 
-        public static void writePreview(MidiOut midiOut, LocToPad locToPad, int index)
+        public static void WritePreview(MidiOut midiOut, LocToPad locToPad, int index)
         {
             WriteMidi(midiOut, locToPad, index, defaultPreviewColor);
         }
 
-        public static void writeActive(MidiOut midiOut, LocToPad locToPad, int index)
+        public static void WriteActive(MidiOut midiOut, LocToPad locToPad, int index)
         {
             WriteMidi(midiOut, locToPad, index, defaultActiveColor);
         }
 
-        public static void writePreviewAndOverlay(MidiOut midiOut, LocToPad locToPad, int index)
+        public static void WritePreviewAndOverlay(MidiOut midiOut, LocToPad locToPad, int index)
         {
-            writeWithBlinkBrightnessMidi(midiOut, locToPad, index, defaultPreviewColor, 9);
+            WriteWithBlinkBrightnessMidi(midiOut, locToPad, index, defaultPreviewColor, 9);
         }
 
-        public static void writeOverlay(MidiOut midiOut, LocToPad locToPad, int index)
+        public static void WriteOverlay(MidiOut midiOut, LocToPad locToPad, int index)
         {
             WriteMidi(midiOut, locToPad, index, defaultOverlayColor);
         }
 
-        public static void writeAudioActive(MidiOut midiOut, LocToPad locToPad, int index)
+        public static void WriteAudioActive(MidiOut midiOut, LocToPad locToPad, int index)
         {
             WriteMidi(midiOut, locToPad, index + 32, defaultAudioActiveColor);          
         }
 
-        public static void 
+        public static void WriteAudioMuted(MidiOut midiOut, LocToPad locToPad, int index)
+        {
+            WriteMidi(midiOut, locToPad, index + 32, defaultAudioDisabledColor);
+        }
 
+        public static async void WritePreviewActive(MidiOut midiOut, LocToPad locToPad, int index)
+        {
+            WriteMidi(midiOut, locToPad, index, defaultPreviewColor);
+            Thread.Sleep(50);
+            WriteMidi(midiOut, locToPad, index, defaultActiveColor);
+            Thread.Sleep(50);
+            return;
+        }
 
+        public static void ClearPad(MidiOut midiOut, LocToPad locToPad)
+        {
+            for (int i = 0; i < 64; i++)
+            {
+                WriteMidi(midiOut, locToPad, i, defaultColor);
+            }
 
+            for (int i = 100; i < 119; i++)
+            {
+                WriteLittle(midiOut, i, false, false);
+            }
+        }
 
+        public static void ClearIndex(MidiOut midiOut, LocToPad locToPad, int index)
+        {
+            WriteMidi(midiOut, locToPad, index, defaultColor);
+        }
 
+        public static void SleepMode(MidiOut midiOut, LocToPad locToPad)
+        {
+            Random r = new Random();
+            int[] possibleAmounts = { 1, 2, 4, 8, 16, 32 };
+            bool theSame = Convert.ToBoolean(r.Next(2));
+            int amountpercycle = possibleAmounts[r.Next(possibleAmounts.Length)];
+            int clr = r.Next(127);
+            int mode = r.Next(10) + 1;
+            for (int i = 1; i <= 64; i++)
+            {
+                WriteWithBlinkBrightnessMidi(midiOut, locToPad, i, clr, mode);
+                if (i % amountpercycle == 0)
+                {
+                    Thread.Sleep(50 * amountpercycle);
+                    if (!theSame)
+                    {
+                        clr = r.Next(127);
+                    }
+                }
+            }
+            for (int i = 100; i <= 117; i++)
+            {
+                WriteLittle(midiOut, i, Convert.ToBoolean(r.Next(2) - 1), Convert.ToBoolean(r.Next(2) - 1));
+            }
+        }
 
 
     }

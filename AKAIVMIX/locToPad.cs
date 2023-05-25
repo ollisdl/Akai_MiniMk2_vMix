@@ -8,7 +8,7 @@ namespace AKAIVMIX
 {
     internal class LocToPad
     {
-        protected bool topToBottom = true;
+        public bool topToBottom = true;
 
         public LocToPad(bool topToBottom)
         {

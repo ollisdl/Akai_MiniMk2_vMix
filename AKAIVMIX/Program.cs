@@ -7,19 +7,12 @@ namespace AKAIVMIX
     class Looop
     {
         private static Input[] inputs;
-        private static int defaultColor = 0;
-        private static int defaultPreviewColor = 21;
-        private static int defaultActiveColor = 5;
-        private static int defaultOverlayColor = 13;
-        private static int defaultAudioActiveColor = 46;
         private bool init = true;
         
-
-
         static void Main(string[] args)
         {
             int midiIn = MidiIn.NumberOfDevices;
-            bool needClear = false;
+            bool needClear = true;
             LocToPad locToPad = new LocToPad(true);
             MidiOut midi = new MidiOut(1);
             ClearPad(midi, locToPad);
@@ -37,7 +30,6 @@ namespace AKAIVMIX
                     }
                     for (int i = 0; i < inputs.Length; i++)
                     {
-
                         var item = inputs[i];
                         if (item != null)
                         {
@@ -56,36 +48,36 @@ namespace AKAIVMIX
                                 }
                                 if (!item.preview && !item.active && (item.overlay == -1))
                                 {
-                                    WriteDefault(midi, locToPad, item.number);
+                                    WritePreviewActive(midi, locToPad, item.number);
                                 }
                                 if (item.preview && item.active)
                                 {
                                     WritePreviewActive(midi, locToPad, item.number);
                                 }
-                                if (item.preview)
+                                if (item.preview && !item.active)
                                 {
-                                    WriteDefault(midi, locToPad, item.number);
+                                    WritePreview(midi, locToPad, item.number);
                                 }
                                 if (item.active)
                                 {
-                                    WriteDefault(midi, locToPad, item.number);
+                                    WriteActive(midi, locToPad, item.number);
                                 }
                                 if (item.overlay != -1)
                                 {
                                     if (item.preview)
                                     {
-                                        WriteDefault(midi, locToPad, item.number);
+                                        WritePreviewAndOverlay(midi, locToPad, item.number);
                                     }
                                     else
-                                        WriteDefault(midi, locToPad, item.number);
+                                        WriteOverlay(midi, locToPad, item.number);
                                 }
                                 if (!item.muted)
                                 {
-                                    WriteDefault(midi, locToPad, item.number);
+                                    WriteAudioActive(midi, locToPad, item.number);
                                 }
                                 if (item.muted)
                                 {
-                                    WriteDefault(midi, locToPad, item.number);
+                                    WriteAudioMuted(midi, locToPad, item.number);
                                 }
                             }
                         }
