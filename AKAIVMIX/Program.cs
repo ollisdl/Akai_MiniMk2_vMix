@@ -9,7 +9,7 @@ namespace AKAIVMIX
         private static Input[]? inputs;
         private static bool needClear = true;
         private static MidiOut? midi;
-        private static LocToPad? locToPad;
+        private static LocToPad locToPad = new LocToPad(true);
 
         static void Main(string[] args)
         {
@@ -82,8 +82,6 @@ namespace AKAIVMIX
                     config.Write("devid", deviceID.ToString());
                 }
             }
-
-            needClear = true; // alert the loop that we should clear on startup
 
             //Main loop.
             while (true)
