@@ -10,6 +10,7 @@ namespace AKAIVMIX
     {
         public int number;
         public string? title;
+        public bool hasAudio = false;
         public bool muted = true;
         public bool active = false;
         public bool preview = false;

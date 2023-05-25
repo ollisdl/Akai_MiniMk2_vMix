@@ -38,6 +38,10 @@ namespace AKAIVMIX
                             {
                                 newInput.muted = bool.Parse(reader.Value);
                             }
+                            else if (reader.Name == "volume")
+                            {
+                                newInput.hasAudio = true;
+                            }
                             if (newInput.number != 0)
                             {
                                 inputs[newInput.number - 1] = newInput;
@@ -73,6 +77,24 @@ namespace AKAIVMIX
                 }
             }
             return inputs;
+        }
+
+        internal static Input[] audio(Input[] inputs)
+        {
+            Input[] inputsWithAudio = new Input[8];
+            int count = 0;
+
+            foreach (Input input in inputs)
+            {
+                if (input.hasAudio)
+                {
+                    if (count < 7)
+                    {
+                        inputsWithAudio[count] = input;
+                        count++;
+                    }
+                }
+            }
         }
     }
 }

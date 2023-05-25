@@ -10,6 +10,7 @@ namespace AKAIVMIX
         private static bool needClear = true;
         private static MidiOut? midi;
         private static LocToPad locToPad = new LocToPad(true);
+        private static Input[] first8AudioSources = new Input[8];
 
         static void Main(string[] args)
         {
@@ -91,12 +92,22 @@ namespace AKAIVMIX
                 try
                 {
                     inputs = ReadTheApiUpdateLoop.ReadApi();
+                    first8AudioSources = ReadTheApiUpdateLoop.audio(inputs);
                     if(needClear)
                     {
                         ClearPad(midi, locToPad);
                         needClear= false;
+                        Console.Clear();
+                        Console.WriteLine("Connected to vMix with " + inputs.Length + "inputs.");
+                        Console.WriteLine("\tSilders are assinged to:");
+                        foreach(var input in first8AudioSources)
+                        {
+                            Console.WriteLine("\t" + input.number + ": " + input.title);
+                        }
+                        Console.WriteLine("\t 9: Master Volume")
                     }
                     InputHandler.CheckInputsAndHandle(midi, locToPad, inputs);
+                    InputHandler.HandleSliders(midi, locToPad, first8AudioSources);
                     Thread.Sleep(250);
                 }
                 catch (Exception e)

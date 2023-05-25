@@ -68,5 +68,31 @@ namespace AKAIVMIX
                 }
             }
         }
+
+        public static void HandleSliders(MidiOut midi, LocToPad locToPad, Input[] inputs)
+        {
+            if (midi == null) return;
+            for(int i = 0; i < inputs.Length; i++) 
+            {
+                Input input = inputs[i];
+                if(input != null)
+                {
+                    if(input.muted)
+                    {
+                        WriteLittle(midi, i+100, true, true);
+                    }
+                    else
+                    {
+                        WriteLittle(midi, i + 100, true, false);
+                    }
+                }
+                else
+                {
+                    WriteLittle(midi, i + 100, false, false);
+                }
+            }
+        }
     }
+
+
 }
