@@ -1,15 +1,8 @@
-﻿using System;
-using System.Reflection;
+﻿using NAudio.Midi;
 using System.Xml;
-using NAudio.Midi;
 
 namespace ReadXMLfromURL
 {
-    /// <summary>
-    /// Summary description for Class1.
-    /// </summary>
-    /// 
-
     public class locToPad
     {
         public static int getNoteLocFromIndex(int index)
@@ -20,6 +13,7 @@ namespace ReadXMLfromURL
             return (((newRow) * 8) + positionInNewRow);
         }
     }
+
     public class Input
     {
         public int number;
@@ -31,7 +25,7 @@ namespace ReadXMLfromURL
         public override string ToString()
         {
             string overlaystring = "False";
-            if (overlay != -1) 
+            if (overlay != -1)
             {
                 overlaystring = (overlay + 1).ToString();
             }
@@ -139,10 +133,10 @@ namespace ReadXMLfromURL
 
         private static void writeLittle(MidiOut midiOut, int index, bool on, bool blink)
         {
-            var noteOnEvent = new NoteOnEvent(0L , 1, index, 0, 0);
-            if(on)
+            var noteOnEvent = new NoteOnEvent(0L, 1, index, 0, 0);
+            if (on)
             {
-                if(blink)
+                if (blink)
                 {
                     noteOnEvent = new NoteOnEvent(0L, 1, index, 2, 0);
                 }
@@ -150,7 +144,7 @@ namespace ReadXMLfromURL
                 {
                     noteOnEvent = new NoteOnEvent(0L, 1, index, 8, 0);
                 }
-                
+
             }
             midiOut.Send(noteOnEvent.GetAsShortMessage());
             midiOut.Send(noteOnEvent.OffEvent.GetAsShortMessage());
@@ -158,7 +152,7 @@ namespace ReadXMLfromURL
         }
         private static void writePreview(MidiOut midiOut, int index)
         {
-            var noteOnEvent = new NoteOnEvent(0L, 6, locToPad.getNoteLocFromIndex(index-1), defaultPreviewColor, 0);
+            var noteOnEvent = new NoteOnEvent(0L, 6, locToPad.getNoteLocFromIndex(index - 1), defaultPreviewColor, 0);
             midiOut.Send(noteOnEvent.GetAsShortMessage());
             midiOut.Send(noteOnEvent.OffEvent.GetAsShortMessage());
             return;
@@ -183,8 +177,6 @@ namespace ReadXMLfromURL
             write(midiOut, index, defaultOverlayColor); return;
         }
 
-
-
         private static void writeAudioActive(MidiOut midiOut, int index)
         {
             //Console.WriteLine(locToPad.getNoteLocFromIndex(index - 1 + 32));
@@ -202,7 +194,6 @@ namespace ReadXMLfromURL
             midiOut.Send(noteOnEvent.OffEvent.GetAsShortMessage());
             return;
         }
-
         private static async void WritePreviewActive(MidiOut midiOut, int index)
         {
             var noteOnEvent = new NoteOnEvent(0L, 6, locToPad.getNoteLocFromIndex(index - 1), defaultPreviewColor, 0);
@@ -231,7 +222,7 @@ namespace ReadXMLfromURL
 
         private static void clearIndex(MidiOut midiOut, int index)
         {
-            var noteOnEvent = new NoteOnEvent(0L, 6, locToPad.getNoteLocFromIndex(index-1), defaultColor, 0);
+            var noteOnEvent = new NoteOnEvent(0L, 6, locToPad.getNoteLocFromIndex(index - 1), defaultColor, 0);
             midiOut.Send(noteOnEvent.GetAsShortMessage());
             midiOut.Send(noteOnEvent.OffEvent.GetAsShortMessage());
         }
@@ -239,39 +230,27 @@ namespace ReadXMLfromURL
         private static void sleepMode(MidiOut midiOut)
         {
             Random r = new Random();
-            int[] possibleAmounts = {1,2,4,8,16,32};
+            int[] possibleAmounts = { 1, 2, 4, 8, 16, 32 };
             bool theSame = Convert.ToBoolean(r.Next(2));
             int amountpercycle = possibleAmounts[r.Next(possibleAmounts.Length)];
             int clr = r.Next(127);
             int mode = r.Next(10) + 1;
-            for (int i = 1; i <=64; i++)
+            for (int i = 1; i <= 64; i++)
             {
                 writeBlinkBrightness(midiOut, i, clr, mode);
-                if(i%amountpercycle == 0)
+                if (i % amountpercycle == 0)
                 {
-                    Thread.Sleep(50*amountpercycle);
-                    if(!theSame)
+                    Thread.Sleep(50 * amountpercycle);
+                    if (!theSame)
                     {
                         clr = r.Next(127);
                     }
-                    
                 }
             }
             for (int i = 100; i <= 117; i++)
             {
                 writeLittle(midiOut, i, Convert.ToBoolean(r.Next(2) - 1), Convert.ToBoolean(r.Next(2) - 1));
             }
-            
-
-            /*
-            for (int i = 1; i <= 64; i++)
-            {
-                writeBlinkBrightness(midiOut, i, r.Next(127),r.Next(15)+1);
-            }
-
-            Console.WriteLine("SLEEP");
-            */
-
         }
 
         static void Main(string[] args)
@@ -285,20 +264,20 @@ namespace ReadXMLfromURL
                 try
                 {
                     inputs = ReadTheApiUpdateLoop.RunThisShit();
-                    if (inputs[0] != null )
+                    if (inputs[0] != null)
                     {
                         for (int j = 112; j < 114; j++)
                         {
                             writeLittle(midi, j, true, false);
                         }
                     }
-                    for(int i = 0; i < inputs.Length; i++)
+                    for (int i = 0; i < inputs.Length; i++)
                     {
-                        
+
                         var item = inputs[i];
                         if (item != null)
                         {
-                            if(item.number <= 32)
+                            if (item.number <= 32)
                             {
                                 if (needClear)
                                 {
@@ -310,9 +289,7 @@ namespace ReadXMLfromURL
                                     {
                                         writeLittle(midi, j, true, false);
                                     }
-                                    
                                 }
-                                //Console.WriteLine(item);
                                 if (!item.preview && !item.active && (item.overlay == -1))
                                 {
                                     writeDefault(midi, item.number);
@@ -350,8 +327,8 @@ namespace ReadXMLfromURL
                         }
                         else if (item == null)
                         {
-                            if(i <= 32)
-                                writeDefault(midi, i+1);
+                            if (i <= 32)
+                                writeDefault(midi, i + 1);
                         }
                     }
                     Thread.Sleep(250);
@@ -364,14 +341,7 @@ namespace ReadXMLfromURL
                     sleepMode(midi);
                     needClear = true;
                 }
-                
-
-                
-                
             }
-
-            midi.Close();
-
         }
     }
 }
