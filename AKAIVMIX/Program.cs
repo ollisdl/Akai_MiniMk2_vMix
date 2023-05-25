@@ -104,7 +104,7 @@ namespace AKAIVMIX
                         {
                             Console.WriteLine("\t" + input.number + ": " + input.title);
                         }
-                        Console.WriteLine("\t 9: Master Volume")
+                        Console.WriteLine("\t 9: Master Volume");
                     }
                     InputHandler.CheckInputsAndHandle(midi, locToPad, inputs);
                     InputHandler.HandleSliders(midi, first8AudioSources);
