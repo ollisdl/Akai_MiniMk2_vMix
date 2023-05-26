@@ -28,20 +28,20 @@ namespace AKAIVMIX
                     {
                         if (!item.preview && !item.active && (item.overlay == -1))
                         {
-                            WritePreviewActive(midi, locToPad, item.number);
-                        }
+                            WriteDefault(midi, locToPad, item.number);
+                        }else
                         if (item.preview && item.active)
                         {
                             WritePreviewActive(midi, locToPad, item.number);
-                        }
+                        }else
                         if (item.preview && !item.active)
                         {
                             WritePreview(midi, locToPad, item.number);
-                        }
+                        }else
                         if (item.active)
                         {
                             WriteActive(midi, locToPad, item.number);
-                        }
+                        }else
                         if (item.overlay != -1)
                         {
                             if (item.preview)
@@ -49,12 +49,15 @@ namespace AKAIVMIX
                                 WritePreviewAndOverlay(midi, locToPad, item.number);
                             }
                             else
+                            {
                                 WriteOverlay(midi, locToPad, item.number);
-                        }
+                            }
+                                
+                        }else
                         if (!item.muted)
                         {
                             WriteAudioActive(midi, locToPad, item.number);
-                        }
+                        }else
                         if (item.muted)
                         {
                             WriteAudioMuted(midi, locToPad, item.number);

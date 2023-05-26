@@ -90,7 +90,7 @@ namespace AKAIVMIX
                 {
                     if (input.hasAudio)
                     {
-                        if (count < 7)
+                        if (count < 8)
                         {
                             inputsWithAudio[count] = input;
                             count++;

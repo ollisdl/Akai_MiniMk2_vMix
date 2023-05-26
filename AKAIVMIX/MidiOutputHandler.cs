@@ -111,7 +111,7 @@ namespace AKAIVMIX
             WriteMidi(midiOut, locToPad, index, defaultColor);
         }
 
-        public static void SleepMode(MidiOut midiOut, LocToPad locToPad)
+        public static async void SleepMode(MidiOut midiOut, LocToPad locToPad)
         {
             Random r = new Random();
             int[] possibleAmounts = { 1, 2, 4, 8, 16, 32 };

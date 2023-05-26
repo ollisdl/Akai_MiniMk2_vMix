@@ -9,13 +9,53 @@ namespace AKAIVMIX
         private static Input[]? inputs;
         private static bool needClear = true;
         private static MidiOut? midi;
+        private static int midiID;
         private static LocToPad locToPad = new LocToPad(true);
         private static Input[] first8AudioSources = new Input[8];
+        private static IniFile config = new IniFile();
 
+        static void menu()
+        {
+            Console.Clear();
+            Console.WriteLine("Main Menu");
+            Console.WriteLine("1: Change Volume Silder");
+            Console.WriteLine("2: Change Midi Device");
+            Console.WriteLine("3: Toggle Audio Mode");
+            Console.WriteLine("4: Exit");
+            Console.WriteLine("Enter your selection or press ESC to return to program");
+            needClear = true;
+            switch (Console.ReadKey(true).Key)
+            {
+                default:
+                    Console.Clear();
+                    Console.ReadLine();
+                    break;
+                case ConsoleKey.Escape:
+                    Console.Clear();
+                    break;
+                case ConsoleKey.D1:
+                    Console.Clear();
+                    break;
+                case ConsoleKey.D2:
+                    Console.Clear();
+                    midi.Close();
+                    midiID = MidiFinder.MidiOutSelector();
+                    midi = new MidiOut(midiID);
+                    config.Write("devid", midiID.ToString());
+                    break;
+                case ConsoleKey.D3:
+                    Console.Clear();
+                    break;
+                case ConsoleKey.D4:
+                    Console.Clear();
+                    break;
+
+            }
+        }
         static void Main(string[] args)
         {
             string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\AKAIVMIX.INI";
-            IniFile config = new IniFile(FilePath);
+            config = new IniFile(FilePath);
 
             //Configure TopToBottom or BottomToTop and generate LocToPad
             if(!config.KeyExists("topToBottom"))
@@ -58,9 +98,9 @@ namespace AKAIVMIX
                 }
                 else
                 {
-                    int devId = MidiFinder.MidiOutSelector();
-                    midi = new MidiOut(devId);
-                    config.Write("devid", devId.ToString());
+                    midiID = MidiFinder.MidiOutSelector();
+                    midi = new MidiOut(midiID);
+                    config.Write("devid", midiID.ToString());
                 }
             }
             else
@@ -79,6 +119,7 @@ namespace AKAIVMIX
                     catch
                     {
                         Console.WriteLine("Failed to attach. Make sure device is not busy or selected by vMix");
+
                         midi = new MidiOut(MidiFinder.MidiOutSelector());
                     }
                     config.Write("devid", deviceID.ToString());
@@ -89,44 +130,52 @@ namespace AKAIVMIX
             //Main loop.
             while (true)
             {
-                try
+                do
                 {
-                    inputs = ReadTheApiUpdateLoop.ReadApi();
-                    first8AudioSources = ReadTheApiUpdateLoop.audio(inputs); 
-                    if(needClear)
+                    while (!Console.KeyAvailable)
                     {
-                        ClearPad(midi, locToPad);
-                        needClear= false;
-                        Console.Clear();
-                        int inputCounts = 0;
-                        foreach (var input in inputs)
+                        try
                         {
-                            if(input != null)
-                                inputCounts++;
-                        }
+                            inputs = ReadTheApiUpdateLoop.ReadApi();
+                            first8AudioSources = ReadTheApiUpdateLoop.audio(inputs);
+                            if (needClear)
+                            {
+                                ClearPad(midi, locToPad);
+                                needClear = false;
+                                Console.Clear();
+                                int inputCounts = 0;
+                                foreach (var input in inputs)
+                                {
+                                    if (input != null)
+                                        inputCounts++;
+                                }
 
 
-                        Console.WriteLine("Connected to vMix with " + inputCounts + " inputs.");
-                        Console.WriteLine("\tSilders are assinged to:");
-                        foreach(var input in first8AudioSources)
-                        {
-                            if(input != null)
-                                Console.WriteLine("\t" + input.number + ": " + input.title);
+                                Console.WriteLine("Connected to vMix with " + inputCounts + " inputs.");
+                                Console.WriteLine("\tSilders are assinged to:");
+                                foreach (var input in first8AudioSources)
+                                {
+                                    if (input != null)
+                                        Console.WriteLine("\t" + input.number + ": " + input.title);
+                                }
+                                Console.WriteLine("\t 0: Master Volume");
+                                Console.WriteLine("Press ESC to open menu");
+                            }
+                            InputHandler.CheckInputsAndHandle(midi, locToPad, inputs);
+                            InputHandler.HandleSliders(midi, first8AudioSources);
+                            Thread.Sleep(250);
                         }
-                        Console.WriteLine("\t 0: Master Volume");
+                        catch (Exception e)
+                        {
+                            Console.Clear();
+                            Console.WriteLine("Failed to connect to vMix or read Input List. Going to sleep.");
+                            Console.WriteLine(e.Message);
+                            Task.Run(() => SleepMode(midi, locToPad));
+                            needClear = true;
+                        }
                     }
-                    InputHandler.CheckInputsAndHandle(midi, locToPad, inputs);
-                    InputHandler.HandleSliders(midi, first8AudioSources);
-                    Thread.Sleep(250);
-                }
-                catch (Exception e)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Failed to connect to vMix or read Input List. Going to sleep.");
-                    Console.WriteLine(e.Message);
-                    SleepMode(midi, locToPad);
-                    needClear = true;
-                }
+                } while (Console.ReadKey(true).Key != ConsoleKey.Escape);
+                menu();
             }
         }
     }
