@@ -14,7 +14,7 @@ namespace AKAIVMIX
         {
             if (inputs[0] != null)
             {
-                for (int j = 112; j < 114; j++)
+                for (int j = 112; j < 116; j++)
                 {
                     WriteLittle(midi, j, true, false);
                 }
@@ -24,11 +24,11 @@ namespace AKAIVMIX
                 var item = inputs[i];
                 if (item != null)
                 {
-                    if (item.number <= 32)
+                    if (item.number < 32)
                     {
                         if (!item.preview && !item.active && (item.overlay == -1))
                         {
-                            WritePreviewActive(midi, locToPad, item.number);
+                            WriteDefault(midi, locToPad, item.number);
                         }
                         if (item.preview && item.active)
                         {
@@ -63,7 +63,7 @@ namespace AKAIVMIX
                 }
                 else if (item == null)
                 {
-                    if (i <= 32)
+                    if (i < 32)
                         WriteDefault(midi, locToPad, i + 1);
                 }
             }

@@ -7,13 +7,25 @@ namespace AKAIVMIX
     class Looop
     {
         private static Input[]? inputs;
-        private static bool needClear = true;
-        private static MidiOut? midi;
-        private static LocToPad locToPad = new LocToPad(true);
+        public static bool needClear = true;
+        public static MidiOut? midi;
+        public static LocToPad locToPad = new LocToPad(true);
         private static Input[] first8AudioSources = new Input[8];
+        public static int activeColor = 1;
+        public static int previewColor = 69;
+        public static int sleepColor = 1;
+        public static int audioColor = 51;
+        public static int sleepMode = 1;
+        public static int defaultColor = 1;
+        public static int overlayColor = 1;
+        public static int mutedColor = 1;
 
+
+        [STAThread]
         static void Main(string[] args)
         {
+            Application.EnableVisualStyles();
+
             string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\AKAIVMIX.INI";
             IniFile config = new IniFile(FilePath);
 
@@ -84,6 +96,50 @@ namespace AKAIVMIX
                     config.Write("devid", deviceID.ToString());
                 }
             }
+
+            if(!config.KeyExists("activeColor"))
+            {
+                activeColor = ClrForm.formResult("Choose a color for the active source");
+                if (activeColor == -1)
+                {
+                    activeColor = 1;
+                }
+                config.Write("activeColor", activeColor.ToString());
+            }
+            else
+            {
+                activeColor = int.Parse(config.Read("activeColor"));
+            }
+
+            if (!config.KeyExists("sleepColor"))
+            {
+                sleepColor = ClrForm.formResult("Choose a color for sleep mode 2 (Static)");
+                if (sleepColor == -1)
+                {
+                    sleepColor = 1;
+                }
+                config.Write("sleepColor", sleepColor.ToString());
+            }
+            else
+            {
+                sleepColor = int.Parse(config.Read("sleepColor"));
+            }
+
+            if (!config.KeyExists("sleepMode"))
+            {
+                sleepMode = SleepModeForm.formResult("Choose a sleep mode:");
+                if (sleepMode == -1)
+                {
+                    sleepMode = 1;
+                }
+                config.Write("sleepMode", sleepMode.ToString());
+            }
+            else
+            {
+                sleepMode = int.Parse(config.Read("sleepMode"));
+            }
+
+
             Console.WriteLine("Connected to " + MidiOut.DeviceInfo(int.Parse(config.GetKeyValue("devid"))).ProductName);
 
             //Main loop.
@@ -124,7 +180,7 @@ namespace AKAIVMIX
                     Console.Clear();
                     Console.WriteLine("Failed to connect to vMix or read Input List. Going to sleep.");
                     Console.WriteLine(e.Message);
-                    SleepMode(midi, locToPad);
+                    SleepMode(midi, locToPad, sleepMode, sleepColor);
                     needClear = true;
                 }
             }
