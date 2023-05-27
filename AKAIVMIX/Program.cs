@@ -27,7 +27,7 @@ namespace AKAIVMIX
             Application.EnableVisualStyles();
 
             string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\AKAIVMIX.INI";
-            IniFile config = new IniFile(FilePath);
+            config = new IniFile(FilePath);
 
             //Configure TopToBottom or BottomToTop and generate LocToPad
             if(!config.KeyExists("topToBottom"))
@@ -70,9 +70,9 @@ namespace AKAIVMIX
                 }
                 else
                 {
-                    int devId = MidiFinder.MidiOutSelector();
-                    midi = new MidiOut(devId);
-                    config.Write("devid", devId.ToString());
+                    midiID = MidiFinder.MidiOutSelector();
+                    midi = new MidiOut(midiID);
+                    config.Write("devid", midiID.ToString());
                 }
             }
             else
@@ -91,6 +91,7 @@ namespace AKAIVMIX
                     catch
                     {
                         Console.WriteLine("Failed to attach. Make sure device is not busy or selected by vMix");
+
                         midi = new MidiOut(MidiFinder.MidiOutSelector());
                     }
                     config.Write("devid", deviceID.ToString());
@@ -145,21 +146,25 @@ namespace AKAIVMIX
             //Main loop.
             while (true)
             {
-                try
+                do
                 {
-                    inputs = ReadTheApiUpdateLoop.ReadApi();
-                    first8AudioSources = ReadTheApiUpdateLoop.audio(inputs); 
-                    if(needClear)
+                    while (!Console.KeyAvailable)
                     {
-                        ClearPad(midi, locToPad);
-                        needClear= false;
-                        Console.Clear();
-                        int inputCounts = 0;
-                        foreach (var input in inputs)
+                        try
                         {
-                            if(input != null)
-                                inputCounts++;
-                        }
+                            inputs = ReadTheApiUpdateLoop.ReadApi();
+                            first8AudioSources = ReadTheApiUpdateLoop.audio(inputs);
+                            if (needClear)
+                            {
+                                ClearPad(midi, locToPad);
+                                needClear = false;
+                                Console.Clear();
+                                int inputCounts = 0;
+                                foreach (var input in inputs)
+                                {
+                                    if (input != null)
+                                        inputCounts++;
+                                }
 
 
                         Console.WriteLine("Connected to vMix with " + inputCounts + " inputs.");
