@@ -100,7 +100,7 @@ namespace AKAIVMIX
             // ClrForm
             // 
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(324, 509);
             this.Name = "ClrForm";
             this.ResumeLayout(false);
 

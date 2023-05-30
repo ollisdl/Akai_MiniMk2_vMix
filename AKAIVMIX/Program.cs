@@ -6,7 +6,7 @@ namespace AKAIVMIX
 {
     class Looop
     {
-        private static IniFile? config;
+        public static IniFile? config;
         private static Input[]? inputs;
         public static bool needClear = true;
         public static MidiOut? midi;
@@ -30,37 +30,6 @@ namespace AKAIVMIX
 
             string FilePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\AKAIVMIX.INI";
             config = new IniFile(FilePath);
-
-            //Configure TopToBottom or BottomToTop and generate LocToPad
-            if (!config.KeyExists("topToBottom"))
-            {
-                int topToBottom = -1;
-                while (topToBottom < 0)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Would you like rows to go bottom up or top down?");
-                    Console.WriteLine("0: Bottom Up");
-                    Console.WriteLine("1: Top Down");
-                    Console.WriteLine("Enter selection number, then press Enter:");
-                    bool valid = int.TryParse(Console.ReadLine(), out topToBottom);
-                    if (valid)
-                    {
-                        if (topToBottom < 0 || topToBottom > 1)
-                        {
-                            Console.WriteLine("Invalid Selection. Let's Try again:");
-                        }
-                        else
-                        {
-                            config.Write("topToBottom", topToBottom.ToString());
-                            locToPad = new LocToPad(Convert.ToBoolean(topToBottom));
-                        }
-                    }
-                }
-            }
-            else
-            {
-                locToPad = new LocToPad(Convert.ToBoolean(int.Parse(config.GetKeyValue("topToBottom"))));
-            }
 
             //Load device from config or display selector
             if (!config.KeyExists("devid"))
@@ -98,6 +67,16 @@ namespace AKAIVMIX
                     }
                     config.Write("devid", deviceID.ToString());
                 }
+            }
+
+
+            if (!config.KeyExists("topToBottom"))
+            {
+
+            }
+            else
+            {
+                locToPad = new LocToPad(Convert.ToBoolean(int.Parse(config.GetKeyValue("topToBottom"))));
             }
 
             if (!config.KeyExists("activeColor"))
@@ -142,6 +121,11 @@ namespace AKAIVMIX
                 sleepMode = int.Parse(config.Read("sleepMode"));
             }
 
+
+            SetupForm f = new SetupForm("Test");
+            f.ShowDialog();
+
+            //Configure TopToBottom or BottomToTop and generate LocToPad
 
             Console.WriteLine("Connected to " + MidiOut.DeviceInfo(int.Parse(config.GetKeyValue("devid"))).ProductName);
 
@@ -188,6 +172,12 @@ namespace AKAIVMIX
                         SleepMode(midi, locToPad, sleepMode, sleepColor);
                         needClear = true;
                     }
+                }
+                var key = Console.ReadKey();
+                if(key.Key == ConsoleKey.Escape)
+                {
+                    f = new SetupForm("Test");
+                    f.ShowDialog();
                 }
             }
         }
