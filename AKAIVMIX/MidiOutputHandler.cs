@@ -10,12 +10,6 @@ namespace AKAIVMIX
 {
     internal static class MidiOutputHandler
     {
-        private static int defaultColor = 0;
-        private static int defaultPreviewColor = 21;
-        private static int defaultActiveColor = 5;
-        private static int defaultOverlayColor = 13;
-        private static int defaultAudioActiveColor = 46;
-        private static int defaultAudioDisabledColor = 0;
 
         public static void WriteWithBlinkBrightnessMidi(MidiOut midiOut, LocToPad locToPad, int index, int color, int birghtorblink)
         {

@@ -41,7 +41,7 @@ namespace AKAIVMIX
                         if (item.active)
                         {
                             WriteActive(midi, locToPad, item.number);
-                        }else
+                        }
                         if (item.overlay != -1)
                         {
                             if (item.preview)
@@ -53,7 +53,7 @@ namespace AKAIVMIX
                                 WriteOverlay(midi, locToPad, item.number);
                             }
                                 
-                        }else
+                        }
                         if (!item.muted)
                         {
                             WriteAudioActive(midi, locToPad, item.number);
